@@ -864,6 +864,7 @@ public class ContractValidationHelper {
 
 Consumer tests automatically generate Pact files in the `target/pacts` directory when they run. These files contain the contract specifications based on your actual test interactions with the mock server.
 
+### Single Provider Scenario
 ```java
 @Test
 void shouldGenerateContractFiles() {
@@ -875,6 +876,200 @@ void shouldGenerateContractFiles() {
     assertThat(pactDirectory).exists();
     assertThat(pactDirectory.resolve("user-consumer-user-provider.json")).exists();
 }
+```
+
+### Multiple Provider Scenario
+
+When your consumer application depends on multiple upstream services, you will have **multiple contract files** in the pacts folder. Each consumer-provider pair generates its own contract file.
+
+#### Example: E-commerce Consumer with Multiple Providers
+
+```
+target/pacts/
+├── ecommerce-frontend-user-service.json          # User management contract
+├── ecommerce-frontend-product-service.json       # Product catalog contract
+├── ecommerce-frontend-payment-service.json       # Payment processing contract
+├── ecommerce-frontend-inventory-service.json     # Inventory management contract
+└── ecommerce-frontend-notification-service.json  # Email/SMS notifications contract
+```
+
+#### Organizing Tests for Multiple Providers
+
+```java
+// Base configuration for all provider tests
+@TestPropertySource(properties = {
+    "pact.consumer.name=ecommerce-frontend",
+    "pact.pactDirectory=target/pacts"
+})
+public abstract class BaseConsumerTest {
+    // Common test configuration
+}
+
+// User Service Contract Tests
+@ExtendWith(PactConsumerTestExt.class)
+@PactTestFor(providerName = "user-service", hostInterface = "localhost", pactVersion = PactSpecVersion.V3)
+class UserServiceConsumerTest extends BaseConsumerTest {
+    
+    private static final String PROVIDER_NAME = "user-service";
+    
+    @Pact(consumer = "ecommerce-frontend")
+    public RequestResponsePact createUserPact(PactDslWithProvider builder) {
+        return builder
+            .given("user creation is available")
+            .uponReceiving("a request to create a user")
+            .path("/users")
+            .method("POST")
+            .headers(Map.of("Content-Type", "application/json"))
+            .body(new PactDslJsonBody()
+                .stringType("name", "John Doe")
+                .stringType("email", "john@example.com"))
+            .willRespondWith()
+            .status(201)
+            .body(new PactDslJsonBody()
+                .uuid("id")
+                .stringType("name", "John Doe")
+                .stringType("email", "john@example.com"))
+            .toPact();
+    }
+    
+    @Test
+    @PactTestFor(pactMethod = "createUserPact", pactVersion = PactSpecVersion.V3)
+    void shouldCreateUser(MockServer mockServer) {
+        UserServiceClient client = new UserServiceClient(mockServer.getUrl());
+        UserResponse response = client.createUser(new CreateUserRequest("John Doe", "john@example.com"));
+        assertThat(response.getName()).isEqualTo("John Doe");
+    }
+}
+
+// Product Service Contract Tests
+@ExtendWith(PactConsumerTestExt.class)
+@PactTestFor(providerName = "product-service", hostInterface = "localhost", pactVersion = PactSpecVersion.V3)
+class ProductServiceConsumerTest extends BaseConsumerTest {
+    
+    private static final String PROVIDER_NAME = "product-service";
+    
+    @Pact(consumer = "ecommerce-frontend")
+    public RequestResponsePact getProductsPact(PactDslWithProvider builder) {
+        return builder
+            .given("products exist in catalog")
+            .uponReceiving("a request to get products")
+            .path("/products")
+            .method("GET")
+            .query("category=electronics&limit=10")
+            .willRespondWith()
+            .status(200)
+            .body(new PactDslJsonArray()
+                .object()
+                    .uuid("id")
+                    .stringType("name", "Laptop")
+                    .numberType("price", 999.99)
+                    .stringType("category", "electronics")
+                .closeObject())
+            .toPact();
+    }
+    
+    @Test
+    @PactTestFor(pactMethod = "getProductsPact", pactVersion = PactSpecVersion.V3)
+    void shouldGetProducts(MockServer mockServer) {
+        ProductServiceClient client = new ProductServiceClient(mockServer.getUrl());
+        List<Product> products = client.getProducts("electronics", 10);
+        assertThat(products).hasSize(1);
+        assertThat(products.get(0).getCategory()).isEqualTo("electronics");
+    }
+}
+
+// Payment Service Contract Tests
+@ExtendWith(PactConsumerTestExt.class)
+@PactTestFor(providerName = "payment-service", hostInterface = "localhost", pactVersion = PactSpecVersion.V3)
+class PaymentServiceConsumerTest extends BaseConsumerTest {
+    
+    private static final String PROVIDER_NAME = "payment-service";
+    
+    @Pact(consumer = "ecommerce-frontend")
+    public RequestResponsePact processPaymentPact(PactDslWithProvider builder) {
+        return builder
+            .given("payment processing is available")
+            .uponReceiving("a request to process payment")
+            .path("/payments")
+            .method("POST")
+            .headers(Map.of("Content-Type", "application/json"))
+            .body(new PactDslJsonBody()
+                .numberType("amount", 99.99)
+                .stringType("currency", "USD")
+                .stringType("cardToken", "tok_visa"))
+            .willRespondWith()
+            .status(200)
+            .body(new PactDslJsonBody()
+                .uuid("transactionId")
+                .stringType("status", "completed")
+                .numberType("amount", 99.99))
+            .toPact();
+    }
+    
+    @Test
+    @PactTestFor(pactMethod = "processPaymentPact", pactVersion = PactSpecVersion.V3)
+    void shouldProcessPayment(MockServer mockServer) {
+        PaymentServiceClient client = new PaymentServiceClient(mockServer.getUrl());
+        PaymentResponse response = client.processPayment(
+            new PaymentRequest(99.99, "USD", "tok_visa"));
+        assertThat(response.getStatus()).isEqualTo("completed");
+    }
+}
+```
+
+#### Contract File Naming Convention
+
+Pact automatically generates contract files using the pattern:
+```
+{consumer-name}-{provider-name}.json
+```
+
+**Examples:**
+- `ecommerce-frontend-user-service.json`
+- `ecommerce-frontend-product-service.json`
+- `ecommerce-frontend-payment-service.json`
+
+#### Managing Multiple Contracts
+
+```java
+@Test
+void shouldGenerateAllProviderContracts() {
+    Path pactDirectory = Paths.get("target/pacts");
+    
+    // Verify all expected contract files are generated
+    assertThat(pactDirectory.resolve("ecommerce-frontend-user-service.json")).exists();
+    assertThat(pactDirectory.resolve("ecommerce-frontend-product-service.json")).exists();
+    assertThat(pactDirectory.resolve("ecommerce-frontend-payment-service.json")).exists();
+    assertThat(pactDirectory.resolve("ecommerce-frontend-inventory-service.json")).exists();
+    assertThat(pactDirectory.resolve("ecommerce-frontend-notification-service.json")).exists();
+}
+```
+
+#### Publishing Multiple Contracts
+
+When publishing to PactFlow, all contract files in the pacts directory are published:
+
+```bash
+# Publishes ALL contract files in the pacts directory
+pact-broker publish ./target/pacts \
+  --consumer-app-version 1.0.0 \
+  --branch main \
+  --broker-base-url https://your-pactflow-broker.com
+```
+
+This will publish:
+- `ecommerce-frontend` ↔ `user-service` contract
+- `ecommerce-frontend` ↔ `product-service` contract  
+- `ecommerce-frontend` ↔ `payment-service` contract
+- And so on...
+
+#### Best Practices for Multiple Providers
+
+1. **Separate Test Classes**: Create separate test classes for each provider
+2. **Consistent Naming**: Use clear, descriptive provider names
+3. **Shared Configuration**: Use base test classes for common configuration
+4. **Independent Testing**: Each provider contract should be testable independently
+5. **Clear Organization**: Group related interactions within each provider test class
 
 ## Common Pitfalls and Solutions
 
