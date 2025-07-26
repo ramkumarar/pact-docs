@@ -1,0 +1,121 @@
+{
+  "consumer": {
+    "name": "user-consumer"
+  },
+  "provider": {
+    "name": "user-provider"
+  },
+  "interactions": [
+    {
+      "description": "Create user with valid data",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "John Doe",
+          "age": 30,
+          "email": "john.doe@example.com"
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": "12345",
+          "name": "John Doe",
+          "age": 30,
+          "email": "john.doe@example.com"
+        }
+      }
+    },
+    {
+      "description": "Create user with invalid age (negative)",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Jane Doe",
+          "age": -5,
+          "email": "jane.doe@example.com"
+        }
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "error": "Invalid age. Age must be between 0 and 110",
+          "code": "INVALID_AGE"
+        }
+      }
+    },
+    {
+      "description": "Create user with invalid age (too high)",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Old Person",
+          "age": 150,
+          "email": "old@example.com"
+        }
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "error": "Invalid age. Age must be between 0 and 110",
+          "code": "INVALID_AGE"
+        }
+      }
+    },
+    {
+      "description": "Create user with invalid email",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Bob Smith",
+          "age": 25,
+          "email": "invalid-email"
+        }
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "error": "Invalid email format",
+          "code": "INVALID_EMAIL"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}

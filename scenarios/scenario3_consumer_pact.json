@@ -1,0 +1,125 @@
+{
+  "consumer": {
+    "name": "user-consumer"
+  },
+  "provider": {
+    "name": "user-provider"
+  },
+  "interactions": [
+    {
+      "description": "Create user with additional phone number field",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "John Doe",
+          "age": 30,
+          "email": "john.doe@example.com",
+          "phoneNumber": "+1-555-123-4567"
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": "12345",
+          "name": "John Doe",
+          "age": 30,
+          "email": "john.doe@example.com",
+          "phoneNumber": "+1-555-123-4567"
+        }
+      }
+    },
+    {
+      "description": "Create user with additional address field",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Jane Smith",
+          "age": 28,
+          "email": "jane.smith@example.com",
+          "address": {
+            "street": "123 Main St",
+            "city": "Anytown",
+            "zipCode": "12345"
+          }
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": "67890",
+          "name": "Jane Smith",
+          "age": 28,
+          "email": "jane.smith@example.com",
+          "address": {
+            "street": "123 Main St",
+            "city": "Anytown",
+            "zipCode": "12345"
+          }
+        }
+      }
+    },
+    {
+      "description": "Create user with multiple additional fields",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Bob Johnson",
+          "age": 45,
+          "email": "bob.johnson@example.com",
+          "phoneNumber": "+1-555-987-6543",
+          "department": "Engineering",
+          "jobTitle": "Senior Developer",
+          "preferences": {
+            "newsletter": true,
+            "notifications": false
+          }
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": "33333",
+          "name": "Bob Johnson",
+          "age": 45,
+          "email": "bob.johnson@example.com",
+          "phoneNumber": "+1-555-987-6543",
+          "department": "Engineering",
+          "jobTitle": "Senior Developer",
+          "preferences": {
+            "newsletter": true,
+            "notifications": false
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}

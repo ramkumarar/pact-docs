@@ -1,0 +1,89 @@
+{
+  "consumer": {
+    "name": "user-consumer"
+  },
+  "provider": {
+    "name": "user-provider"
+  },
+  "interactions": [
+    {
+      "description": "Create user without email (missing mandatory field)",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "John Doe",
+          "age": 30
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": "12345",
+          "name": "John Doe",
+          "age": 30
+        }
+      }
+    },
+    {
+      "description": "Create user without name (missing mandatory field)",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "age": 25
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": "67890",
+          "age": 25
+        }
+      }
+    },
+    {
+      "description": "Create user with only age (missing multiple mandatory fields)",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "age": 35
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": "11111",
+          "age": 35
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "consumer": {
+    "name": "user-consumer"
+  },
+  "provider": {
+    "name": "user-provider"
+  },
+  "interactions": [
+    {
+      "description": "Create user with old contract (no department field)",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "John Doe",
+          "age": 30,
+          "email": "john.doe@example.com"
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": "12345",
+          "name": "John Doe",
+          "age": 30,
+          "email": "john.doe@example.com"
+        }
+      }
+    },
+    {
+      "description": "Create user expecting old response format",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Jane Smith",
+          "age": 25,
+          "email": "jane.smith@example.com"
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "id": "67890",
+          "name": "Jane Smith",
+          "age": 25,
+          "email": "jane.smith@example.com"
+        }
+      }
+    },
+    {
+      "description": "Create user with validation error expectations",
+      "providerState": "user creation is available",
+      "request": {
+        "method": "POST",
+        "path": "/users",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "name": "Invalid User",
+          "age": -10,
+          "email": "invalid-email"
+        }
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "error": "Invalid age. Age must be between 0 and 110",
+          "code": "INVALID_AGE"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}

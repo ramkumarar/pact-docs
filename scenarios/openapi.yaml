@@ -1,0 +1,124 @@
+openapi: 3.0.3
+info:
+  title: User Management API
+  description: API for managing users
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+paths:
+  /users:
+    post:
+      summary: Create a new user
+      description: Creates a new user with name, age, and email
+      operationId: createUser
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+            examples:
+              validUser:
+                summary: Valid user creation request
+                value:
+                  name: "John Doe"
+                  age: 30
+                  email: "john.doe@example.com"
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+              examples:
+                createdUser:
+                  summary: Successfully created user
+                  value:
+                    id: "12345"
+                    name: "John Doe"
+                    age: 30
+                    email: "john.doe@example.com"
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidAge:
+                  summary: Invalid age error
+                  value:
+                    error: "Invalid age. Age must be between 0 and 110"
+                    code: "INVALID_AGE"
+                invalidEmail:
+                  summary: Invalid email error
+                  value:
+                    error: "Invalid email format"
+                    code: "INVALID_EMAIL"
+
+components:
+  schemas:
+    CreateUserRequest:
+      type: object
+      required:
+        - name
+        - age
+        - email
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: User's full name
+        age:
+          type: integer
+          minimum: 0
+          maximum: 110
+          description: User's age in years
+        email:
+          type: string
+          format: email
+          description: User's email address
+      additionalProperties: false
+
+    UserResponse:
+      type: object
+      required:
+        - id
+        - name
+        - age
+        - email
+      properties:
+        id:
+          type: string
+          description: Generated unique user ID
+        name:
+          type: string
+          description: User's full name
+        age:
+          type: integer
+          minimum: 0
+          maximum: 110
+          description: User's age in years
+        email:
+          type: string
+          format: email
+          description: User's email address
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - code
+      properties:
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
