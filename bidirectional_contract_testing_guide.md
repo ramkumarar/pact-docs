@@ -246,8 +246,93 @@ pact-broker record-deployment \
 5. **Document Changes**: Maintain clear documentation of API changes and their impact
 6. **Test Early**: Run contract validation as early as possible in the development cycle
 
+### OpenAPI Schema Design Best Practices
+
+#### additionalProperties Configuration
+When designing OpenAPI specifications for bidirectional contract testing, carefully consider the `additionalProperties` setting:
+
+**Recommended Approach: Default to `additionalProperties: true`**
+```yaml
+# ✅ Recommended - Follows Robustness Principle
+CreateUserRequest:
+  type: object
+  required: [name, email]
+  properties:
+    name:
+      type: string
+    email:
+      type: string
+      format: email
+    age:
+      type: integer
+      minimum: 0
+      maximum: 110
+  additionalProperties: true  # Be liberal in what you accept
+```
+
+**Use `additionalProperties: false` Only When Necessary**
+```yaml
+# ⚠️ Use sparingly - Only for security or strict business requirements
+PaymentRequest:
+  type: object
+  required: [amount, currency, cardNumber]
+  properties:
+    amount:
+      type: number
+    currency:
+      type: string
+    cardNumber:
+      type: string
+  additionalProperties: false  # Strict validation for sensitive data
+```
+
+#### Why Default to `additionalProperties: true`?
+
+1. **Robustness Principle**: "Be conservative in what you send, be liberal in what you accept"
+2. **Forward Compatibility**: Allows consumers to send additional fields without breaking
+3. **Gradual Evolution**: Enables incremental API changes without coordination
+4. **Reduced Coupling**: Consumers can evolve independently of providers
+
+#### When to Use `additionalProperties: false`
+
+- **Security Requirements**: Sensitive endpoints (payments, authentication)
+- **Strict Business Rules**: When additional data could cause business logic issues
+- **Performance Concerns**: When processing unknown fields impacts performance
+- **Compliance**: When regulatory requirements mandate strict validation
+
+#### Impact on Contract Testing
+
+```yaml
+# This configuration affects contract compatibility:
+additionalProperties: false
+```
+
+**Common Error with `additionalProperties: false`:**
+```
+Request body is incompatible with the request body schema in the spec file: 
+must NOT have additional properties - phoneNumber
+```
+
+**Resolution Strategies:**
+1. **Provider**: Change to `additionalProperties: true` if business rules allow
+2. **Consumer**: Remove additional properties from contract expectations
+3. **Coordination**: Add the property to the OpenAPI specification if it should be supported
+
 ## Conclusion
 
 Bidirectional Contract Testing provides a pragmatic approach to contract testing that leverages existing tools and processes. It's particularly valuable for organizations looking to retrofit contract testing onto existing systems or those working with third-party APIs where traditional Pact testing isn't feasible.
 
 The key advantage is the decoupling of teams - providers and consumers can work independently while maintaining confidence that their integrations will work correctly in production.
+
+## Next Steps
+
+- **Implementation**: Start with [Consumer Testing Best Practices](spring_boot_consumer_testing_best_practices.md) or [Provider Testing Best Practices](spring_boot_provider_testing_best_practices.md)
+- **Troubleshooting**: Reference [Compatibility Checks Guide](pactflow_compatibility_checks_reference.md) when issues arise
+- **Examples**: Review [Test Scenarios](pactflow_test_scenarios.md) for real-world examples
+
+## Related Documentation
+
+- [Spring Boot Consumer Testing Best Practices](spring_boot_consumer_testing_best_practices.md) - Consumer implementation guide
+- [Spring Boot Provider Testing Best Practices](spring_boot_provider_testing_best_practices.md) - Provider implementation guide
+- [PactFlow Compatibility Checks Reference](pactflow_compatibility_checks_reference.md) - Troubleshooting reference
+- [PactFlow Test Scenarios](pactflow_test_scenarios.md) - Real-world testing scenarios

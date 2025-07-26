@@ -1,0 +1,46 @@
+site_name: Bidirectional Contract Testing Guide
+site_description: Comprehensive guide for implementing bidirectional contract testing with PactFlow
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Overview: bidirectional_contract_testing_guide.md
+    - When to Use: when-to-use-bidirectional-testing.md
+  - Implementation Guides:
+    - Consumer Testing: spring_boot_consumer_testing_best_practices.md
+    - Provider Testing: spring_boot_provider_testing_best_practices.md
+  - Testing Scenarios:
+    - Test Scenarios: pactflow_test_scenarios.md
+    - Scenario Examples: scenarios/pactflow_test_scenarios.md
+  - Troubleshooting:
+    - Compatibility Checks: pactflow_compatibility_checks_reference.md
+    - Common Issues: troubleshooting-common-issues.md
+  - Reference:
+    - CLI Commands: cli-commands-reference.md
+    - Configuration: configuration-reference.md
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.share
+
+plugins:
+  - search
+  - techdocs-core
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed
+  - toc:
+      permalink: true
