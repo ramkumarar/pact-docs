@@ -91,11 +91,18 @@ See also: #456, #789
 - Changes affecting multiple components
 - Any time the "why" isn't clear from code
 
-**Formatting rules:**
+**Conventional Commits format:**
+- ✅ Use required format: `<type>[scope]: [PROJECT-ID] <description>`
+- ✅ Include mandatory JIRA ticket: `[TXB-1234]`, `[DEV-5678]`, etc.
+- ✅ Use `feat:` for new features, `fix:` for bug fixes
+- ✅ Add `!` or `BREAKING CHANGE:` footer for breaking changes
+- ✅ Use descriptive scopes when helpful: `feat(auth): [TXB-1234] ...`
+
+**General formatting rules:**
 - ✅ Separate subject and body with blank line
 - ✅ Subject line ≤ 50 characters  
-- ✅ Capitalize subject line
+- ✅ Lowercase the description (after colon)
 - ✅ No period at end of subject
-- ✅ Use imperative mood ("Fix bug" not "Fixed bug")
+- ✅ Use imperative mood ("add feature" not "added feature")
 - ✅ Wrap body at 72 characters
 - ✅ Explain what and why, not how
