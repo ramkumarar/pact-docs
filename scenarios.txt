@@ -72,4 +72,15 @@ config.keys = {
   -- Navigate panes
   { key = 'h', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Left' },
   { key = 'l', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Right' },
-  { key =
+  { key = 'k', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Up' },
+  { key = 'j', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Down' },
+}
+
+-- ==================== MISC ====================
+
+config.audible_bell = "Disabled"
+config.enable_scroll_bar = false
+config.scrollback_lines = 10000
+
+-- Return the configuration
+return config
