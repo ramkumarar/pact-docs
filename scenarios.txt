@@ -1,1 +1,90 @@
-config.default_prog = { [[C:\Program Files\Git\bin\bash.exe]], '-i', '-l' }
+-- Pull in the wezterm API
+local wezterm = require 'wezterm'
+
+-- This will hold the configuration
+local config = wezterm.config_builder()
+
+-- ==================== BASIC SETTINGS ====================
+
+-- Appearance
+config.color_scheme = 'Catppuccin Mocha'     -- Nice modern dark theme (or try 'Dracula', 'Tokyo Night', 'OneHalfDark')
+config.font = wezterm.font('JetBrains Mono', { weight = 'Regular', italic = false })
+config.font_size = 11.0
+config.line_height = 1.1
+config.initial_cols = 120
+config.initial_rows = 35
+
+-- Window
+config.window_decorations = "RESIZE"          -- or "TITLE | RESIZE"
+config.window_padding = {
+  left = 8,
+  right = 8,
+  top = 8,
+  bottom = 8,
+}
+config.enable_tab_bar = true
+config.hide_tab_bar_if_only_one_tab = true
+config.tab_bar_at_bottom = false
+config.use_fancy_tab_bar = true
+
+-- ==================== SHELL / DEFAULT PROGRAM ====================
+
+-- Default to WSL Bash (best experience on Windows)
+config.default_prog = { 'wsl.exe', 'bash', '-l' }
+
+-- Alternative options (uncomment the one you prefer):
+
+-- Git Bash
+-- config.default_prog = { [[C:\Program Files\Git\bin\bash.exe]], '-i', '-l' }
+
+-- PowerShell 7 (if you prefer)
+-- config.default_prog = { 'pwsh.exe', '-NoLogo' }
+
+-- ==================== LAUNCH MENU (Right-click or Ctrl+Shift+L) ====================
+
+config.launch_menu = {
+  {
+    label = 'WSL Bash',
+    args = { 'wsl.exe', 'bash', '-l' },
+  },
+  {
+    label = 'Git Bash',
+    args = { [[C:\Program Files\Git\bin\bash.exe]], '-i', '-l' },
+  },
+  {
+    label = 'PowerShell',
+    args = { 'pwsh.exe', '-NoLogo' },
+  },
+  {
+    label = 'Command Prompt',
+    args = { 'cmd.exe' },
+  },
+}
+
+-- ==================== KEYBINDINGS ====================
+
+config.keys = {
+  -- New tab
+  { key = 't', mods = 'CTRL|SHIFT', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
+  -- New window
+  { key = 'n', mods = 'CTRL|SHIFT', action = wezterm.action.SpawnWindow },
+  -- Close tab
+  { key = 'w', mods = 'CTRL|SHIFT', action = wezterm.action.CloseCurrentTab { confirm = true } },
+  -- Split panes
+  { key = '|', mods = 'CTRL|SHIFT', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
+  { key = '-', mods = 'CTRL|SHIFT', action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' } },
+  -- Pane navigation
+  { key = 'h', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Left' },
+  { key = 'l', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Right' },
+  { key = 'k', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Up' },
+  { key = 'j', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Down' },
+}
+
+-- ==================== MISC ====================
+
+config.audible_bell = "Disabled"
+config.enable_scroll_bar = false
+config.scrollback_lines = 5000
+
+-- Return the final configuration
+return config
