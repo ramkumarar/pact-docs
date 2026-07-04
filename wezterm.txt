@@ -1,3 +1,13 @@
 "C:\Program Files\WezTerm\wezterm-gui.exe" start
 
 "C:\Program Files\WezTerm\wezterm-gui.exe" start -- wsl.exe -d Ubuntu bash -l
+
+config.skip_close_confirmation_for_processes_named = {
+  'bash',
+  'zsh',
+  'fish',
+  'sh',
+  'git-bash',
+  'wsl.exe',
+  'pwsh.exe',
+}
